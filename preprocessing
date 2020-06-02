@@ -1,0 +1,31 @@
+import cv2 
+import numpy as np
+
+img=cv2.imread("breast.jpeg")
+filterd_img=cv2.medianBlur(img,10)
+
+norm_img=np.zeros((800,800))
+new_img=cv2.normalize(filterd_img,norm_img,0,255,cv2.NORM_MINMAX)
+
+cv2.imshow("before",img)
+cv2.imshow("after norm",new_img)
+cv2.imshow("filterd img",filterd_img)
+
+ret,threshold_img=cv2.threshold(new_img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+cv2.imshow("final img",threshold_img)
+
+#new_image=new_img.copy()
+
+h,w=new_img.shape[:2]
+mask=np.zeros((h+2,w+2),np.uint8)
+
+flood_img=cv2.floodfill(new_img,mask,(0,0),255)
+
+flood_img_inv=cv2.bitwise_not(flood_img)
+
+final_img=threshold_img|flood_img_inv
+
+cv2.imshow("final img",final_img)
+
+cv2.waitKey(1)
+cv2.destroyAllWindows()
