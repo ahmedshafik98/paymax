@@ -1,0 +1,54 @@
+#importing libraries
+import numpy as np
+import cv2
+import pandas as pd
+from matplotlib import pyplot as plt
+from google.colab.patches import cv2_imshow
+
+
+
+
+
+#reading img
+
+img = cv2.imread('mdb001.pgm')
+img= cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+#cv2.imshow('img',img)
+
+df=pd.DataFrame()
+
+#add original values to datafreame as feature n.1
+
+img2=img.reshape(-1)
+df['orgn pixel']=img2
+print(df.head())
+
+#add ather set of features(gabor filter)
+
+kernel= cv2.getGaborKernel
+
+
+******************************************************
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+ksize=5
+sigma=3
+theta=1*np.pi/4
+lamda=1*np.pi/4
+gamma=0.5
+phi=0
+kernel=cv2.getGaborKernel((ksize,ksize),sigma,theta,lamda,gamma,phi,ktype=cv2.CV_32F)
+
+
+img=cv2.imread('mdb001.pgm')
+img=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+kerneld=cv2.resize(kernel,(400,400))
+fimg=cv2.filter2D(img,cv2.CV_8UC3,kernel)
+from google.colab.patches import cv2_imshow
+
+cv2_imshow(img)
+cv2_imshow(kerneld)
+cv2_imshow(fimg)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
