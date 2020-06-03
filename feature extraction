@@ -82,9 +82,30 @@ median_img1=median_img.reshape(-1)
 df['median']=median_img1
 
 
+labeld_image=cv2.imread('mdb001.pgm')
+labeld_image=cv2.cvtColor(labeld_image,cv2.COLOR_BGR2GRAY)
+labeld_image1=labeld_image.reshape(-1)
+df['label']=labeld_image1
+
+########################################
+
+Y=df['label'].values
+X=df.drop(labels=['label'],axis=1)
+############################
+#split data
+
+from sklearn.model_selection import train_test_split
+X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.4,random_state=44) 
+
+from sklearn.ensemble import RandomForestClassifier
+model=RandomForestClassifier(n_estimators=10,random_state=20)
+model.fit(X_train,Y_train)
 
 
+prediction_test=model.predict(X_test)
+
+from sklearn import metrics
+print('Acuracy=',metrics.accuracy_score(Y_test,prediction_test))
 
 
-
-
+##Acuracy= 0.9891066707038821
