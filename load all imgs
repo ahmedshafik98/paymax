@@ -1,0 +1,107 @@
+##2nd feature set
+
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+import pandas as pd
+from google.colab.patches import cv2_imshow
+
+
+def feature_extraction(img):
+  df=pd.DataFrame()
+
+
+  img2=img.reshape(-1)
+  df["pix. values"]=img2       #first feature pix. no.
+
+  ksize=5
+
+
+  num=1
+  for theta in range(2):
+    theta=theta/4 *np.pi
+    for sigma in (3,5):
+      for lamda in np.arange(0,np.pi,np.pi/4):
+        for gamma in (0.05,0.5):
+          Gabor_label='Gabor'+str(num)
+          kernel=cv2.getGaborKernel((ksize,ksize),sigma,theta,lamda,gamma,0,ktype=cv2.CV_32F) #2nd feature set
+          fimg=cv2.filter2D(img,cv2.CV_8UC3,kernel)
+          filtered_img=fimg.reshape(-1)
+          df[Gabor_label]=filtered_img
+  #        print(Gabor_label,'theta:',theta,'gamma:',gamma,'lamda;',lamda,'sigma:',sigma)
+          num +=1
+        
+         #cv2_imshow(fimg)
+#****************************************************************************
+#canny edge
+  edges=cv2.Canny(img,100,255)
+  edges1=edges.reshape(-1)
+  df['canny']=edges1
+
+
+#roberts,sobel,csharr,prewitt Filters
+
+  from skimage.filters import roberts,sobel,scharr,prewitt
+
+  robert=roberts(img)
+  robert1=robert.reshape(-1)
+  df['robert']=robert1
+
+  Sobel=sobel(img)
+  Sobel1=Sobel.reshape(-1)
+  df['Sobel']=Sobel1
+
+
+  Scharr=scharr(img)
+  Scharr1=Scharr.reshape(-1)
+  df['Scharr']=Scharr1
+
+
+
+  Perwit=prewitt(img)
+  Perwit1=Perwit.reshape(-1)
+  df['Perwitt']=Perwit1
+
+
+#Gaussian filters
+
+  from scipy import ndimage as nd
+  from scipy.ndimage import gaussian_filter
+
+  gaussian_image=nd.gaussian_filter(img,sigma=3)
+  gaussian_image1=gaussian_image.reshape(-1)
+  df['Gaussian s3']=gaussian_image1
+
+#*****************************
+  gaussian_image2=nd.gaussian_filter(img,sigma=7)
+  gaussian_image3=gaussian_image2.reshape(-1)
+  df['Gaussian s7']=gaussian_image3
+
+
+#median filter
+  median_img=nd.median_filter(img,size=3)
+  median_img1=median_img.reshape(-1)
+  df['median']=median_img1
+
+
+  return df
+#######################################
+import pickle
+import glob
+
+
+filename='shafik1'
+load_model=pickle.load(open('shafik1','rb'))
+
+path='p/*.pgm'
+for file in golb.glob(path):
+  img1=cv2.imread(file)
+  img2=cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY)
+  X=feature_extraction(img)
+  result=load_model.predict(X)
+  segmented=result.reshape((img.shape))
+  name=file.split("md")
+  plt.imsave('photos\segmented',+name[1],segmented,cmap='jet')
+
+
+
