@@ -7,7 +7,7 @@ import pandas as pd
 from google.colab.patches import cv2_imshow
 
 
-pd.DataFrame()
+df=pd.DataFrame()
 img=cv2.imread('mdb001.pgm')
 img=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 img2=img.reshape(-1)
