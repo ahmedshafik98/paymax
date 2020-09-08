@@ -1,0 +1,98 @@
+#importing libraries
+
+import speech_recognition as sr
+import os
+from gtts import gTTS
+import warnings
+import random
+import wikipedia
+
+#ignore warning msgs
+warnings.filterwarnings('ignore')
+
+#record audio & return to txt
+def rekordAudio():
+
+    r=sr.Recognizer() #recording audio
+    #open mic & start recording
+    with sr.Microphone() as source:
+        print ('say SM...')
+        audio=r.listen(source)
+    #use gogle speech recognition
+    data= ''
+    try:
+        data= r.recognize_google(audio)
+        print('You said: ' +data)
+    except sr.UnknownValueError:      #check for unknown errors
+        print('google can not understand')
+    except sr.RequestError as e :
+        print('request from google speech recognition service error '+e)
+    return data
+
+#fn to get VA responce
+def assistantResponce(text):
+    print(text)
+    #conv text to speech
+    m=gTTS(text=text, lang='en', slow=False)
+    #save the onverted audio to a file
+    m.save('ass_responce.mp3')
+
+
+    #play the converted file
+    os.system('start ass_responce.mp3')
+
+#fn for wake word(s)
+def wakeWord(text):
+    wake_words=['ah','paymax','nurse','help']
+    text=text.lower() #converting text to lower case words
+
+
+    #check if comand contains wake words
+    for phrase in wake_words:
+        if phrase in text:
+            return True
+
+
+    #if wake wors are not found
+    return False
+
+#random greeting response
+def greeting(text):
+
+    greeting_inputs=['hi','hello','morning','hey']
+
+    greeting_response=['hi there','hello sir','hi']
+    for word in text.split():
+        if word.lower() in greeting_inputs:
+            return random.choice(greeting_response) + '.'
+    return ''
+
+#person 1st & last name
+
+def name(text):
+    wordslist=text.split()  #split text into list f words
+    for i in range(0,len(wordslist)):
+        if i + 3<=len(wordslist) - 1 and wordslist[i].lower()=='who' and wordslist[i+1]=='is':
+            return wordslist[i+2]+'' +wordslist[i+3]
+
+
+
+#creating the assistant
+while True:
+    text=rekordAudio()
+    response= ''
+    #check for wake words
+    if (wakeWord(text)== True):
+        assistantResponce('i am awake')
+        #check for greetings
+        response= response +greeting(text)
+
+
+    #if user ask for someone
+    if ('who is' in text):
+        n=name(text)
+        wiki=wikipedia.summary(n,sentences=2)
+        response=response + ' '+ wiki
+
+
+    assistantResponce(response)
